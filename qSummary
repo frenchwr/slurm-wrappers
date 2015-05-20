@@ -1,0 +1,74 @@
+#!/usr/local/bin/python
+#
+# Script for parsing SLURM's squeue command to summarize group and user core usage.
+# This script will work with python 2.7 and above.
+#
+# Author: Will French, Advanced Computing Center for Research and Education, Vanderbilt University
+# Date: May 2015
+#
+import subprocess
+
+def add_group(group_list,group_name,active_jobs,active_cores,pending_jobs,pending_cores):
+	if ( not group_list ):
+		group_list.append([group_name,active_jobs,active_cores,pending_jobs,pending_cores])
+	elif ( group_list[-1][0] != group_name ):
+		group_list.append([group_name,active_jobs,active_cores,pending_jobs,pending_cores])
+	else:
+		group_list[-1][1] += active_jobs
+		group_list[-1][2] += active_cores
+		group_list[-1][3] += pending_jobs
+		group_list[-1][4] += pending_cores
+
+def add_user(user_list,group_name,user_name,active_jobs,active_cores,pending_jobs,pending_cores):
+	if ( not user_list ):
+		user_list.append([group_name,user_name,active_jobs,active_cores,pending_jobs,pending_cores])
+	elif ( user_list[-1][1] != user_name or user_list[-1][0] != group_name ): 
+		user_list.append([group_name,user_name,active_jobs,active_cores,pending_jobs,pending_cores])
+	else:
+		user_list[-1][2] += active_jobs
+		user_list[-1][3] += active_cores
+		user_list[-1][4] += pending_jobs
+		user_list[-1][5] += pending_cores
+
+def print_job_summary(group_list,user_list):
+	user_cnt = 0
+	total_active_jobs = 0
+	total_active_cores = 0
+	total_pending_jobs = 0
+	total_pending_cores = 0
+	print('GROUP                  USER              ACTIVE_JOBS  ACTIVE_CORES  PENDING_JOBS  PENDING_CORES')
+	for group in group_list:
+		total_active_jobs += group[1]
+		total_active_cores += group[2]
+		total_pending_jobs += group[3]
+		total_pending_cores += group[4]
+		print('----------------------------------------------------------------------------------------------')
+		print('{!s:33s} {:13d} {:13d} {:13d} {:13d}'.format(group[0].decode("utf-8"),group[1],group[2],group[3],group[4]))
+		while ( user_list[user_cnt][0] == group[0] ):
+			user = user_list[user_cnt]
+			print('                      {!s:11s} {:13d} {:13d} {:13d} {:13d}'.format(user[1].decode("utf-8"),user[2],user[3],user[4],user[5]))
+			user_cnt += 1
+			if ( user_cnt > len(user_list) - 1 ): break
+
+	print('----------------------------------------------------------------------------------------------')
+	print('Totals:                           {:13d} {:13d} {:13d} {:13d}'.format(total_active_jobs,total_active_cores,total_pending_jobs,total_pending_cores))
+	print('')
+
+def main():
+	cmd = subprocess.Popen('squeue --Format=account,username,numcpus,state --array --noheader | sort -k1,1 | uniq -c', shell=True, stdout=subprocess.PIPE)
+	users = [] # group name, user name, active jobs, active cores, pending jobs, pending cores
+	groups = [] # group name, active jobs, active cores, pending jobs, pending cores
+	for line in cmd.stdout:
+		njobs,group,user,cores,state = line.split()
+		njobs = int(njobs)
+		cores = int(cores)
+		if ( state == "PENDING" ):
+			add_group(groups,group,0,0,njobs,njobs*cores)
+			add_user(users,group,user,0,0,njobs,njobs*cores)
+		else: # RUNNING, COMPLETING, or anything else
+			add_group(groups,group,njobs,njobs*cores,0,0)
+			add_user(users,group,user,njobs,njobs*cores,0,0)
+	print_job_summary(groups,users)
+
+if __name__ == '__main__':
+	main()
