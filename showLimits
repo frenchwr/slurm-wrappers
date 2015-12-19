@@ -37,11 +37,11 @@ def print_summary(account_list,group_list):
 	print('ACCOUNT            GROUP            FAIRSHARE   MAXCPUS   MAXMEM(GB)  MAXCPUTIME(HRS)')
 	for account in account_list:
 		print('--------------------------------------------------------------------------------------')
-		if ( account[3] != 0 and account[4] != 0 ):
+		if ( account[3] != -1 and account[4] != -1 ):
 			print('{!s:25s}   {:13d} {:11d} {:10d} {:15d}'.format(account[0].decode("utf-8"),account[1],account[2],account[3],account[4]))
-		elif ( account[3] != 0 ):
+		elif ( account[3] != -1 ):
 			print('{!s:25s}   {:13d} {:11d} {:10d}               -'.format(account[0].decode("utf-8"),account[1],account[2],account[3]))
-		elif ( account[4] != 0 ):
+		elif ( account[4] != -1 ):
 			print('{!s:25s}   {:13d} {:11d}          - {:15d}'.format(account[0].decode("utf-8"),account[1],account[2],account[4]))
 		else:
 			print('{!s:25s}   {:13d} {:11d}          -               -'.format(account[0].decode("utf-8"),account[1],account[2]))
@@ -50,7 +50,7 @@ def print_summary(account_list,group_list):
 			group = group_list[group_cnt]
 			line = '                  {!s:17s}'.format(group[1].decode("utf-8"))
 			for idx,fld in enumerate(group[2:]):
-				fld = str(fld) if fld != 0 else "-"
+				fld = str(fld) if fld != -1 else "-"
 				if ( idx == 0 ): fld = '     {!s:5s}'.format(fld.decode("utf-8"))  # fairshare
 				elif ( idx == 1 ): fld = '   {!s:>5s}'.format(fld.decode("utf-8"))  # max cpus, > right justifies
 				elif ( idx == 2 ): fld = '      {!s:>5s}'.format(fld.decode("utf-8"))  # max mem
@@ -70,9 +70,9 @@ def main():
 	groups = [] # account name, group name, fairshare, maxcpus, maxmem, cputime
 	for line in cmd.stdout:
 		account,group,user,fairshare,maxcpus,maxmem,cputime = line.split('|')
-		if ( not maxcpus ): maxcpus = 0 # this string is empty if not defined
-		if ( not maxmem ): maxmem = 0 # this string is empty if not defined
-		if ( cputime.isspace() ): cputime = 0 # this string contrains a single whitespace if not defined, so it's non-empty
+		if ( not maxcpus ): maxcpus = -1 # this string is empty if not defined
+		if ( not maxmem ): maxmem = -1 # this string is empty if not defined
+		if ( cputime.isspace() ): cputime = -1 # this string contrains a single whitespace if not defined, so it's non-empty
 		fairshare = int(fairshare)
 		maxcpus = int(maxcpus)
 		maxmem = int(maxmem) / 1024 # convert to GB
