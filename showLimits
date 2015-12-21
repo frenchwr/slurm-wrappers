@@ -32,32 +32,32 @@ def add_group(account_list,group_list,account,group,fairshare,maxcpus,maxmem,cpu
 
 def print_summary(account_list,group_list):
     group_cnt = 0
-    print('ACCOUNT            GROUP            FAIRSHARE   MAXCPUS   MAXMEM(GB)  MAXCPUTIME(HRS)')
+    print('ACCOUNT          GROUP   FAIRSHARE    MAXCPUS   MAXMEM(GB)  MAXCPUTIME(HRS)')
     for account in account_list:
-        print('--------------------------------------------------------------------------------------')
-        allfields = '{!s:17s}'.format(account[0].decode("utf-8"))
+        print('---------------------------------------------------------------------------')
+        allfields = '{!s:24s}'.format(account[0].decode("utf-8"))
         for index,field in enumerate(account[1:]):
             field = str(field) if field != -1 else "-"
-            if ( index == 0 ): field = '     {!s:>19s}'.format(field.decode("utf-8"))  # fairshare
-            elif ( index == 1 ): field = '   {!s:>9s}'.format(field.decode("utf-8"))  # max cpus, > right justifies
-            elif ( index == 2 ): field = '      {!s:>5s}'.format(field.decode("utf-8"))  # max mem
-            else: field = '          {!s:>6s}'.format(field.decode("utf-8"))  # fairshare
+            if ( index == 0 ): field = '{!s:>7s}'.format(field.decode("utf-8"))  # fairshare
+            elif ( index == 1 ): field = '{!s:>12s}'.format(field.decode("utf-8"))  # max cpus
+            elif ( index == 2 ): field = '{!s:>11s}'.format(field.decode("utf-8"))  # max mem
+            else: field = '{!s:>16s}'.format(field.decode("utf-8"))  # fairshare
             allfields += field
         print(allfields)
         while ( group_list[group_cnt][0] == account[0] ):
             group = group_list[group_cnt]
-            line = '                  {!s:17s}'.format(group[1].decode("utf-8"))
+            line = '{!s:>25s}'.format(group[1].decode("utf-8"))
             for idx,fld in enumerate(group[2:]):
                 fld = str(fld) if fld != -1 else "-"
-                if ( idx == 0 ): fld = '     {!s:5s}'.format(fld.decode("utf-8"))  # fairshare
-                elif ( idx == 1 ): fld = '   {!s:>5s}'.format(fld.decode("utf-8"))  # max cpus, > right justifies
-                elif ( idx == 2 ): fld = '      {!s:>5s}'.format(fld.decode("utf-8"))  # max mem
-                else: fld = '          {!s:>6s}'.format(fld.decode("utf-8"))  # fairshare
+                if ( idx == 0 ): fld = '{!s:>6s}'.format(fld.decode("utf-8"))  # fairshare
+                elif ( idx == 1 ): fld = '{!s:>12s}'.format(fld.decode("utf-8"))  # max cpus
+                elif ( idx == 2 ): fld = '{!s:>11s}'.format(fld.decode("utf-8"))  # max mem
+                else: fld = '{!s:>16s}'.format(fld.decode("utf-8"))  # fairshare
                 line += fld
             print(line)
             group_cnt += 1
             if ( group_cnt > len(group_list) - 1 ): break
-    print('--------------------------------------------------------------------------------------')
+    print('---------------------------------------------------------------------------')
     print('')
 
 def main():
