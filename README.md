@@ -2,15 +2,7 @@
 
 These are Python wrappers for parsing SLURM commands. Specifically, **qSummary** lists active and pending cores/jobs organized by group and user, while **showLimits** lists account limits for CPU, memory, and CPU time usage.
 
-Both scripts work for Python 2.7 and above. You may need to change the shebang line from:
-
-	#!/usr/local/bin/python
-
-to
-
-	#!/usr/bin/env python
-
-if you do not have a Python 2.7+ interpreter living in /usr/local/bin.
+Both scripts work for Python 2.7 and above.
 
 qSummary
 --------
