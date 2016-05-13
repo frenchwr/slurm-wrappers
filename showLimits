@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 #
 # showLimits : print the fairshare/limits associated with all SLURM accounts and sub-accounts
 # 
@@ -42,10 +42,10 @@ def print_summary(account_list,group_list,slurm_units):
         allfields = '{!s:24s}'.format(account[0].decode("utf-8"))
         for index,field in enumerate(account[1:]):
             field = str(field) if field != -1 else "-"
-            if ( index == 0 ): field = '{!s:>7s}'.format(field.decode("utf-8"))  # fairshare
-            elif ( index == 1 ): field = '{!s:>12s}'.format(field.decode("utf-8"))  # max cpus
-            elif ( index == 2 ): field = '{!s:>11s}'.format(field.decode("utf-8"))  # max mem
-            else: field = '{!s:>16s}'.format(field.decode("utf-8"))  # fairshare
+            if ( index == 0 ): field = '{!s:>7s}'.format(field)  # fairshare
+            elif ( index == 1 ): field = '{!s:>12s}'.format(field)  # max cpus
+            elif ( index == 2 ): field = '{!s:>11s}'.format(field)  # max mem
+            else: field = '{!s:>16s}'.format(field)  # fairshare
             allfields += field
         print(allfields)
         while ( group_list[group_cnt][0] == account[0] ):
@@ -53,10 +53,10 @@ def print_summary(account_list,group_list,slurm_units):
             line = '{!s:>25s}'.format(group[1].decode("utf-8"))
             for idx,fld in enumerate(group[2:]):
                 fld = str(fld) if fld != -1 else "-"
-                if ( idx == 0 ): fld = '{!s:>6s}'.format(fld.decode("utf-8"))  # fairshare
-                elif ( idx == 1 ): fld = '{!s:>12s}'.format(fld.decode("utf-8"))  # max cpus
-                elif ( idx == 2 ): fld = '{!s:>11s}'.format(fld.decode("utf-8"))  # max mem
-                else: fld = '{!s:>16s}'.format(fld.decode("utf-8"))  # fairshare
+                if ( idx == 0 ): fld = '{!s:>6s}'.format(fld)  # fairshare
+                elif ( idx == 1 ): fld = '{!s:>12s}'.format(fld)  # max cpus
+                elif ( idx == 2 ): fld = '{!s:>11s}'.format(fld)  # max mem
+                else: fld = '{!s:>16s}'.format(fld)  # fairshare
                 line += fld
             print(line)
             group_cnt += 1
@@ -70,7 +70,7 @@ def main():
     accounts = [] # account name, fairshare, maxcpus, maxmem, cputime
     groups = [] # account name, group name, fairshare, maxcpus, maxmem, cputime
     for line in cmd.stdout:
-        account,group,user,fairshare,maxcpus,maxmem,cputime = line.split('|')
+        account,group,user,fairshare,maxcpus,maxmem,cputime = line.split(b'|')
         if ( not maxcpus ): maxcpus = -1 # this string is empty if not defined
         if ( not maxmem ): maxmem = -1 # this string is empty if not defined
         if ( cputime.isspace() ): cputime = -1 # this string contrains a single whitespace if not defined, so it's non-empty
@@ -80,9 +80,9 @@ def main():
             maxmem = int(maxmem)
             cputime = int(cputime)
         else:
-            maxmem = int(maxmem) / 1024 # convert to GB
-            cputime = int(cputime) / 60 # convert to minutes 
-        if ( account != "root" and account != "name" ): 
+            maxmem = int(maxmem) // 1024 # convert to GB
+            cputime = int(cputime) // 60 # convert to minutes 
+        if ( account.decode("utf-8") != "root" and account.decode("utf-8") != "name" ): 
             if ( account == selected_account or not selected_account ):
                 add_group(accounts,groups,account,group,fairshare,maxcpus,maxmem,cputime)
     print_summary(accounts,groups,mbs_and_mins)

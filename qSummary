@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 #
 # Script for parsing SLURM's squeue command to summarize group and user core usage.
 # This script will work with python 2.7 and above.
@@ -62,7 +62,7 @@ def main():
 		njobs,group,user,cores,state = line.split()
 		njobs = int(njobs)
 		cores = int(cores)
-		if ( state == "PENDING" ):
+		if ( state.decode("utf-8") == "PENDING" ):
 			add_group(groups,group,0,0,njobs,njobs*cores)
 			add_user(users,group,user,0,0,njobs,njobs*cores)
 		else: # RUNNING, COMPLETING, or anything else
